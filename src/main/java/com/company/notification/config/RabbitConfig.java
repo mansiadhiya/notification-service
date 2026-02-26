@@ -35,16 +35,16 @@ public class RabbitConfig {
 	@Bean
 	Queue employeeQueue() {
 		return QueueBuilder.durable(EMPLOYEE_QUEUE)
-				.withArgument("x-dead-letter-exchange", DLX)
-				.withArgument("x-dead-letter-routing-key", "employee.created.dlq")
+				.deadLetterExchange(DLX)
+				.deadLetterRoutingKey("employee.created.dlq")
 				.build();
 	}
 
 	@Bean
 	Queue leaveQueue() {
 		return QueueBuilder.durable(LEAVE_QUEUE)
-				.withArgument("x-dead-letter-exchange", DLX)
-				.withArgument("x-dead-letter-routing-key", "leave.status.changed.dlq")
+				.deadLetterExchange(DLX)
+				.deadLetterRoutingKey("leave.status.changed.dlq")
 				.build();
 	}
 	

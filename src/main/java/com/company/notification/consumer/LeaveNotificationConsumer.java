@@ -20,37 +20,37 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 public class LeaveNotificationConsumer {
 
-	private final com.company.notification.service.emailService emailService;
-    private final ObjectMapper mapper;
-    private final Validator validator;
+	private final com.company.notification.service.EmailService emailService;
+    private final ObjectMapper objectMapper;
+    private final Validator eventValidator;
 
     @RabbitListener(queues = "leave.notification.queue")
-    public void consume(String message){
+    public void consume(String messageContent){
 
-        log.info("Received leave event: {}", message);
+        log.info("Received leave event: {}", messageContent);
 
         try{
 
-            LeaveStatusChangedEvent event =
-                    mapper.readValue(message, LeaveStatusChangedEvent.class);
+            LeaveStatusChangedEvent leaveEvent =
+                    objectMapper.readValue(messageContent, LeaveStatusChangedEvent.class);
 
-            validate(event);
+            validate(leaveEvent);
 
-            emailService.sendLeaveUpdateEmail(event);
+            emailService.sendLeaveUpdateEmail(leaveEvent);
 
-        } catch (Exception e){
-            log.error("Leave message processing failed", e);
+        } catch (Exception processingException){
+            log.error("Leave message processing failed", processingException);
         }
     }
 
-    private void validate(LeaveStatusChangedEvent event){
+    private void validate(LeaveStatusChangedEvent leaveEvent){
 
-        Set<ConstraintViolation<LeaveStatusChangedEvent>> violations =
-                validator.validate(event);
+        Set<ConstraintViolation<LeaveStatusChangedEvent>> validationViolations =
+                eventValidator.validate(leaveEvent);
 
-        if(!violations.isEmpty())
+        if(!validationViolations.isEmpty())
             throw new IllegalArgumentException(
-                    violations.iterator().next().getMessage());
+                    validationViolations.iterator().next().getMessage());
     }
 
 }

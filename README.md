@@ -369,6 +369,93 @@ INSERT INTO notifications (recipient_id, type, subject, message, status, priorit
 - [ ] Test notification priority
 - [ ] Test pagination
 
+## Test Cases Documentation
+
+### Test Coverage Summary
+- **Total Tests**: 28
+- **Test Classes**: 10
+- **Coverage Target**: 80%+
+
+### Test Structure
+
+#### 1. Service Layer Tests
+**EmailServiceTest** (2 tests)
+- `sendWelcomeEmail_Success`: Validates welcome email sending for new employees
+- `sendLeaveUpdateEmail_Success`: Validates leave status notification emails
+
+#### 2. Consumer Layer Tests
+**EmployeeNotificationConsumerTest** (2 tests)
+- `consume_ValidEvent_SendsEmail`: Tests RabbitMQ message consumption and email trigger
+- `consume_InvalidJson_HandlesException`: Tests error handling for malformed messages
+
+**LeaveNotificationConsumerTest** (2 tests)
+- `consume_ValidEvent_SendsEmail`: Tests leave event consumption and notification
+- `consume_InvalidJson_HandlesException`: Tests exception handling for invalid JSON
+
+#### 3. Configuration Tests
+**RabbitConfigTest** (12 tests)
+- `exchange_CreatesExchange`: Validates main exchange creation
+- `deadLetterExchange_CreatesExchange`: Validates DLX creation
+- `employeeQueue_CreatesQueue`: Tests employee notification queue
+- `leaveQueue_CreatesQueue`: Tests leave notification queue
+- `employeeDLQ_CreatesDeadLetterQueue`: Tests employee DLQ
+- `leaveDLQ_CreatesDeadLetterQueue`: Tests leave DLQ
+- `employeeBinding_CreatesBinding`: Tests employee queue binding
+- `leaveBinding_CreatesBinding`: Tests leave queue binding
+- `employeeDLQBinding_CreatesBinding`: Tests employee DLQ binding
+- `leaveDLQBinding_CreatesBinding`: Tests leave DLQ binding
+- `messageConverter_CreatesConverter`: Tests JSON message converter
+- `rabbitListenerContainerFactory_CreatesFactory`: Tests listener factory
+
+#### 4. DTO Tests
+**EmployeeCreatedEventTest** (1 test)
+- `setAndGetFields`: Validates DTO field setters and getters
+
+**LeaveStatusChangedEventTest** (1 test)
+- `setAndGetFields`: Validates DTO field setters and getters
+
+#### 5. Exception Handling Tests
+**GlobalExceptionHandlerTest** (4 tests)
+- `handleNotificationProcessing_ReturnsInternalServerError`: Tests notification processing exception
+- `handleIllegalArgument_ReturnsBadRequest`: Tests validation error handling
+- `handleValidationExceptions_ReturnsBadRequest`: Tests method argument validation
+- `handleGenericException_ReturnsInternalServerError`: Tests generic exception handling
+
+**ErrorResponseTest** (1 test)
+- `builder_CreatesErrorResponse`: Tests error response builder pattern
+
+**NotificationProcessingExceptionTest** (1 test)
+- `constructor_CreatesException`: Tests custom exception creation
+
+#### 6. Mapper Tests
+**NotificationMapperTest** (1 test)
+- `mapperInterface_Exists`: Validates MapStruct mapper interface
+
+#### 7. Application Tests
+**NotificationServiceApplicationTests** (1 test)
+- `contextLoads`: Validates Spring context loads successfully
+
+### Running Tests
+
+```bash
+# Run all tests
+mvn clean test
+
+# Run with coverage report
+mvn clean test jacoco:report
+
+# Run specific test class
+mvn test -Dtest=EmailServiceTest
+
+# View coverage report
+open target/site/jacoco/index.html
+```
+
+### Test Results
+```
+Tests run: 28, Failures: 0, Errors: 0, Skipped: 0
+```
+
 ## Docker Support
 
 ```dockerfile
